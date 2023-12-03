@@ -4,6 +4,7 @@ import { Command } from "commander";
 import figlet from "figlet";
 import * as cheerio from "cheerio";
 import * as puppeteer from "puppeteer";
+import inquirer from "inquirer";
 
 const program = new Command();
 
@@ -41,6 +42,41 @@ if (options.consolesearch) {
 }
 
 //! Scroll through a console's library
+const consoleURL = "https://squid-proxy.xyz/Nintendo%20Gameboy/";
+async function consoleSearch(url: string): Promise<string[]> {
+  try {
+    const response = await axios.get(url);
+    const html = response.data;
+
+    const $ = cheerio.load(html);
+    const links: string[] = [];
+    const regex = /\/|%20/g;
+    $("a").each((index, element) => {
+      const href = $(element).attr("href");
+      if (href) {
+        if (href.includes(".zip")) {
+          let parsedHref = href.replace(regex, "").replace(regex, " ");
+          links.push(parsedHref);
+        }
+      }
+    });
+
+    const selectedLink = await inquirer.prompt([
+      {
+        type: "list",
+        name: "link",
+        message: "Select a file:",
+        choices: links,
+      },
+    ]);
+
+    return selectedLink.link;
+  } catch (error) {
+    throw new Error("There has been an error!");
+  }
+}
+
+consoleSearch(consoleURL);
 
 async function typeInSearchBar(url: string, searchText: string) {
   try {
