@@ -66,6 +66,11 @@ if (options.library) {
       downloadLink = targetUrl + "Playstation%203/ISO/";
       librarySearch(downloadLink);
       break;
+    case "gamecube":
+      console.log(figlet.textSync("Nintendo Gamecube"));
+      downloadLink = targetUrl + "Nintendo%20Gamecube/US/";
+      librarySearch(downloadLink);
+      break;
     default:
       console.log("Nothing");
   }
@@ -120,6 +125,7 @@ async function consoleSearch(url: string): Promise<string[] | string> {
       {
         type: "list",
         name: "link",
+        pageSize: "20",
         message: "Select a file:",
         choices: links,
       },
