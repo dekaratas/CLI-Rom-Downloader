@@ -48,9 +48,9 @@ if (options.game) {
         const spaceFill = "%20";
         const title = selected;
         const constructedUrl = targetUrl + title.replaceAll(" ", spaceFill);
-        const fileName = title.replaceAll(" ", "_");
-        const savePath = `./${fileName}`;
-        console.log(constructedUrl);
+        const fileName = title.replaceAll(" ", "_").replaceAll("/", "_");
+        const savePath = `${fileName}`;
+        console.log("Le Constructed URL", constructedUrl);
         downloadFile(constructedUrl, savePath)
             .then(() => {
             console.log("File downloaded successfully!");
@@ -161,6 +161,7 @@ function consoleSearch(url) {
             return selectedLink.link;
         }
         catch (error) {
+            console.log(error);
             throw new Error("There has been an error!");
         }
     });
@@ -170,59 +171,56 @@ function typeInSearchBar(url, searchText) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const links = [];
-            const consoleURLs = [
-                "Nintendo%20Gameboy/",
-                "Playstation%201/",
-                "Playstation%202/",
-                "Playstation%203/ISO/",
-                "Nintendo%20Gamecube/US/",
-                "Nintendo%2064/Big%20Endian/",
-                "Nintendo%20Wii/ISO/Usa/",
-                "Playstation%20Portable/ISO/",
-            ];
-            const browser = yield puppeteer.launch({
-                headless: "new",
-            });
-            const page = yield browser.newPage();
-            yield page.goto(url);
-            const content = yield page.content();
-            const $ = cheerio.load(content);
-            const searchBar = $("#search");
-            if (searchBar.length > 0) {
-                yield page.type("#search", searchText);
-                const updatedContent = yield page.content();
-                const parsedContent = updatedContent.replace(/<tr[^>]*hidden[^>]*>.*?<\/tr>\n?/g, "");
-                const updated$ = cheerio.load(parsedContent);
-                const regex = /\//g;
-                const regexTwo = /\/|%20/g;
-                updated$("a").each((index, element) => {
-                    const href = $(element).attr("href");
-                    if (href) {
-                        let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
-                        if (!parsedHref.includes("http") &&
-                            !parsedHref.includes("NoIntro") &&
-                            !parsedHref.includes("?C")) {
-                            console.log(parsedHref);
-                            console.log(href);
-                            links.push(parsedHref);
-                        }
-                    }
+            const consoleURLs = ["Nintendo%20Gameboy/", "Playstation%201/"];
+            // "Playstation%202/",
+            // "Playstation%203/ISO/",
+            // "Nintendo%20Gamecube/US/",
+            // "Nintendo%2064/Big%20Endian/",
+            // "Nintendo%20Wii/ISO/Usa/",
+            // "Playstation%20Portable/ISO/",
+            for (let consoleURL of consoleURLs) {
+                const newUrl = url + consoleURL;
+                const browser = yield puppeteer.launch({
+                    headless: "new",
                 });
-                const selectedLink = yield inquirer.prompt([
-                    {
-                        type: "list",
-                        name: "link",
-                        pageSize: "20",
-                        message: "Select a file:",
-                        choices: links,
-                    },
-                ]);
-                return selectedLink.link;
+                const page = yield browser.newPage();
+                yield page.goto(newUrl);
+                const content = yield page.content();
+                const $ = cheerio.load(content);
+                const searchBar = $("#search");
+                if (searchBar.length > 0) {
+                    yield page.type("#search", searchText);
+                    const updatedContent = yield page.content();
+                    const parsedContent = updatedContent.replace(/<tr[^>]*hidden[^>]*>.*?<\/tr>\n?/g, "");
+                    const updated$ = cheerio.load(parsedContent);
+                    const regex = /\//g;
+                    const regexTwo = /\/|%20/g;
+                    updated$("a").each((index, element) => {
+                        const href = $(element).attr("href");
+                        if (href) {
+                            let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
+                            if (!parsedHref.includes("http") &&
+                                !parsedHref.includes("NoIntro") &&
+                                !parsedHref.includes("?C")) {
+                                console.log(parsedHref);
+                                console.log(href);
+                                console.log(newUrl);
+                                links.push(consoleURL + parsedHref);
+                            }
+                        }
+                    });
+                }
             }
-            else {
-                console.log("Search bar not found.");
-            }
-            yield browser.close();
+            const selectedLink = yield inquirer.prompt([
+                {
+                    type: "list",
+                    name: "link",
+                    pageSize: "20",
+                    message: "Select a file:",
+                    choices: links,
+                },
+            ]);
+            return selectedLink.link;
         }
         catch (error) {
             console.error("Error:", error);

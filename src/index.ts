@@ -52,9 +52,10 @@ if (options.game) {
 
     const constructedUrl = targetUrl + title.replaceAll(" ", spaceFill);
 
-    const fileName = title.replaceAll(" ", "_");
-    const savePath = `./${fileName}`;
-    console.log(constructedUrl);
+    const fileName = title.replaceAll(" ", "_").replaceAll("/", "_");
+
+    const savePath = `${fileName}`;
+    console.log("Le Constructed URL", constructedUrl);
     downloadFile(constructedUrl, savePath)
       .then(() => {
         console.log("File downloaded successfully!");
@@ -172,6 +173,7 @@ async function consoleSearch(url: string): Promise<string[] | string> {
 
     return selectedLink.link;
   } catch (error) {
+    console.log(error);
     throw new Error("There has been an error!");
   }
 }
@@ -191,59 +193,59 @@ async function typeInSearchBar(url: string, searchText: string) {
       "Playstation%20Portable/ISO/",
     ];
 
-    const browser = await puppeteer.launch({
-      headless: "new",
-    });
-    const page = await browser.newPage();
-    await page.goto(url);
-    const content = await page.content();
-    const $ = cheerio.load(content);
+    for (let consoleURL of consoleURLs) {
+      const newUrl = url + consoleURL;
 
-    const searchBar = $("#search");
-
-    if (searchBar.length > 0) {
-      await page.type("#search", searchText);
-      const updatedContent = await page.content();
-      const parsedContent = updatedContent.replace(
-        /<tr[^>]*hidden[^>]*>.*?<\/tr>\n?/g,
-        ""
-      );
-      const updated$ = cheerio.load(parsedContent);
-
-      const regex = /\//g;
-      const regexTwo = /\/|%20/g;
-
-      updated$("a").each((index, element) => {
-        const href = $(element).attr("href");
-        if (href) {
-          let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
-          if (
-            !parsedHref.includes("http") &&
-            !parsedHref.includes("NoIntro") &&
-            !parsedHref.includes("?C")
-          ) {
-            console.log(parsedHref);
-            console.log(href);
-            links.push(parsedHref);
-          }
-        }
+      const browser = await puppeteer.launch({
+        headless: "new",
       });
-      const selectedLink = await inquirer.prompt([
-        {
-          type: "list",
-          name: "link",
-          pageSize: "20",
-          message: "Select a file:",
-          choices: links,
-        },
-      ]);
+      const page = await browser.newPage();
+      await page.goto(newUrl);
+      const content = await page.content();
+      const $ = cheerio.load(content);
 
-      return selectedLink.link;
-    } else {
-      console.log("Search bar not found.");
+      const searchBar = $("#search");
+
+      if (searchBar.length > 0) {
+        await page.type("#search", searchText);
+        const updatedContent = await page.content();
+        const parsedContent = updatedContent.replace(
+          /<tr[^>]*hidden[^>]*>.*?<\/tr>\n?/g,
+          ""
+        );
+        const updated$ = cheerio.load(parsedContent);
+
+        const regex = /\//g;
+        const regexTwo = /\/|%20/g;
+
+        updated$("a").each((index, element) => {
+          const href = $(element).attr("href");
+          if (href) {
+            let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
+            if (
+              !parsedHref.includes("http") &&
+              !parsedHref.includes("NoIntro") &&
+              !parsedHref.includes("?C")
+            ) {
+              console.log(parsedHref);
+              console.log(href);
+              console.log(newUrl);
+              links.push(consoleURL + parsedHref);
+            }
+          }
+        });
+      }
     }
-
-    await browser.close();
+    const selectedLink = await inquirer.prompt([
+      {
+        type: "list",
+        name: "link",
+        pageSize: "20",
+        message: "Select a file:",
+        choices: links,
+      },
+    ]);
+    return selectedLink.link;
   } catch (error) {
     console.error("Error:", error);
   }
