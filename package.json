@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A simple tool that allows quick search and download of ROMs for various emulators",
   "main": "dist/index.js",
+  "bin": {
+    "rom-cli": "./dist/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc"

@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import axios from "axios";
 import * as fs from "fs";
 import { Command } from "commander";
