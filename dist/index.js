@@ -14,14 +14,15 @@ import figlet from "figlet";
 import * as cheerio from "cheerio";
 import * as puppeteer from "puppeteer";
 import inquirer from "inquirer";
+import chalk from "chalk";
 const program = new Command();
-console.log(figlet.textSync("ROM-CLI"));
+console.log(chalk.blue.bold(figlet.textSync("ROM-CLI")));
 program
     .version("1.0.0")
     .description("A simple tool that allows quick search and download of ROMs for various emulators")
     .option("-c, --consoles", "Lists all available consoles and their respective arguments")
     .option("-l, --library <console>", "Scroll through a console's library")
-    .option("-g, --game <value>", "Search for a game")
+    .option("-g, --game <gameName>", "Search for a game (Only one keyword!)")
     .parse(process.argv);
 const options = program.opts();
 //! Get all consoles to list
@@ -38,7 +39,7 @@ if (options.consoles) {
     ];
     const list = [];
     for (let i = 0; i < currentConsoles.length; i++) {
-        console.log(currentConsoles[i]);
+        console.log(chalk.green.bold(currentConsoles[i]));
     }
 }
 //! Search game function
@@ -66,32 +67,32 @@ if (options.library) {
     let downloadLink = "";
     switch (options.library) {
         case "gameboy":
-            console.log(figlet.textSync("Nintendo Gameboy"));
+            console.log(chalk.blue.bold(figlet.textSync("Nintendo Gameboy")));
             downloadLink = targetUrl + "Nintendo%20Gameboy/";
             librarySearch(downloadLink);
             break;
         case "playstation1":
-            console.log(figlet.textSync("PLAYSTATION 1"));
+            console.log(chalk.blue.bold(figlet.textSync("PLAYSTATION 1")));
             downloadLink = targetUrl + "Playstation%201/";
             librarySearch(downloadLink);
             break;
         case "playstation2":
-            console.log(figlet.textSync("PLAYSTATION 2"));
+            console.log(chalk.blue.bold(figlet.textSync("PLAYSTATION 2")));
             downloadLink = targetUrl + "Playstation%202/";
             librarySearch(downloadLink);
             break;
         case "playstation3":
-            console.log(figlet.textSync("PLAYSTATION 3"));
+            console.log(chalk.blue.bold(figlet.textSync("PLAYSTATION 3")));
             downloadLink = targetUrl + "Playstation%203/ISO/";
             librarySearch(downloadLink);
             break;
         case "gamecube":
-            console.log(figlet.textSync("Nintendo Gamecube"));
+            console.log(chalk.blue.bold(figlet.textSync("Nintendo Gamecube")));
             downloadLink = targetUrl + "Nintendo%20Gamecube/US/";
             librarySearch(downloadLink);
             break;
         case "n64":
-            console.log(figlet.textSync("Nintendo 64"));
+            console.log(chalk.blue.bold(figlet.textSync("Nintendo 64")));
             downloadLink = targetUrl + "Nintendo%2064/Big%20Endian/";
             librarySearch(downloadLink);
             break;
@@ -101,7 +102,7 @@ if (options.library) {
             librarySearch(downloadLink);
             break;
         case "psp":
-            console.log(figlet.textSync("Playstation Portable"));
+            console.log(chalk.blue.bold(figlet.textSync("Playstation Portable")));
             downloadLink = targetUrl + "Playstation%20Portable/ISO/";
             librarySearch(downloadLink);
             break;
@@ -118,7 +119,6 @@ function librarySearch(url) {
             const constructedUrl = url + title.replaceAll(" ", spaceFill);
             const fileName = title.replaceAll(" ", "_");
             const savePath = `./${fileName}`;
-            console.log(constructedUrl);
             downloadFile(constructedUrl, savePath)
                 .then(() => {
                 console.log("File downloaded successfully!");
@@ -171,13 +171,16 @@ function typeInSearchBar(url, searchText) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const links = [];
-            const consoleURLs = ["Nintendo%20Gameboy/", "Playstation%201/"];
-            // "Playstation%202/",
-            // "Playstation%203/ISO/",
-            // "Nintendo%20Gamecube/US/",
-            // "Nintendo%2064/Big%20Endian/",
-            // "Nintendo%20Wii/ISO/Usa/",
-            // "Playstation%20Portable/ISO/",
+            const consoleURLs = [
+                "Nintendo%20Gameboy/",
+                "Playstation%201/",
+                "Playstation%202/",
+                "Playstation%203/ISO/",
+                "Nintendo%20Gamecube/US/",
+                "Nintendo%2064/Big%20Endian/",
+                "Nintendo%20Wii/ISO/Usa/",
+                "Playstation%20Portable/ISO/",
+            ];
             for (let consoleURL of consoleURLs) {
                 const newUrl = url + consoleURL;
                 const browser = yield puppeteer.launch({

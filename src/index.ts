@@ -5,10 +5,11 @@ import figlet from "figlet";
 import * as cheerio from "cheerio";
 import * as puppeteer from "puppeteer";
 import inquirer from "inquirer";
+import chalk from "chalk";
 
 const program = new Command();
 
-console.log(figlet.textSync("ROM-CLI"));
+console.log(chalk.blue.bold(figlet.textSync("ROM-CLI")));
 
 program
   .version("1.0.0")
@@ -20,7 +21,7 @@ program
     "Lists all available consoles and their respective arguments"
   )
   .option("-l, --library <console>", "Scroll through a console's library")
-  .option("-g, --game <value>", "Search for a game")
+  .option("-g, --game <gameName>", "Search for a game (Only one keyword!)")
   .parse(process.argv);
 
 const options = program.opts();
@@ -39,7 +40,7 @@ if (options.consoles) {
   ];
   const list: string[] = [];
   for (let i = 0; i < currentConsoles.length; i++) {
-    console.log(currentConsoles[i]);
+    console.log(chalk.green.bold(currentConsoles[i]));
   }
 }
 
@@ -72,32 +73,32 @@ if (options.library) {
   let downloadLink = "";
   switch (options.library) {
     case "gameboy":
-      console.log(figlet.textSync("Nintendo Gameboy"));
+      console.log(chalk.blue.bold(figlet.textSync("Nintendo Gameboy")));
       downloadLink = targetUrl + "Nintendo%20Gameboy/";
       librarySearch(downloadLink);
       break;
     case "playstation1":
-      console.log(figlet.textSync("PLAYSTATION 1"));
+      console.log(chalk.blue.bold(figlet.textSync("PLAYSTATION 1")));
       downloadLink = targetUrl + "Playstation%201/";
       librarySearch(downloadLink);
       break;
     case "playstation2":
-      console.log(figlet.textSync("PLAYSTATION 2"));
+      console.log(chalk.blue.bold(figlet.textSync("PLAYSTATION 2")));
       downloadLink = targetUrl + "Playstation%202/";
       librarySearch(downloadLink);
       break;
     case "playstation3":
-      console.log(figlet.textSync("PLAYSTATION 3"));
+      console.log(chalk.blue.bold(figlet.textSync("PLAYSTATION 3")));
       downloadLink = targetUrl + "Playstation%203/ISO/";
       librarySearch(downloadLink);
       break;
     case "gamecube":
-      console.log(figlet.textSync("Nintendo Gamecube"));
+      console.log(chalk.blue.bold(figlet.textSync("Nintendo Gamecube")));
       downloadLink = targetUrl + "Nintendo%20Gamecube/US/";
       librarySearch(downloadLink);
       break;
     case "n64":
-      console.log(figlet.textSync("Nintendo 64"));
+      console.log(chalk.blue.bold(figlet.textSync("Nintendo 64")));
       downloadLink = targetUrl + "Nintendo%2064/Big%20Endian/";
       librarySearch(downloadLink);
       break;
@@ -107,7 +108,7 @@ if (options.library) {
       librarySearch(downloadLink);
       break;
     case "psp":
-      console.log(figlet.textSync("Playstation Portable"));
+      console.log(chalk.blue.bold(figlet.textSync("Playstation Portable")));
       downloadLink = targetUrl + "Playstation%20Portable/ISO/";
       librarySearch(downloadLink);
       break;
@@ -126,7 +127,6 @@ async function librarySearch(url: string) {
 
     const fileName = title.replaceAll(" ", "_");
     const savePath = `./${fileName}`;
-    console.log(constructedUrl);
     downloadFile(constructedUrl, savePath)
       .then(() => {
         console.log("File downloaded successfully!");
