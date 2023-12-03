@@ -8,7 +8,7 @@ import inquirer from "inquirer";
 
 const program = new Command();
 
-console.log(figlet.textSync("ASH'S ROM DOWNLOADER"));
+console.log(figlet.textSync("ROM-CLI"));
 
 program
   .version("1.0.0")
@@ -16,8 +16,8 @@ program
     "A simple tool that allows quick search and download of ROMs for various emulators"
   )
   .option("-c, --consoles [value]", "Lists all available consoles")
-  .option("-cs, --consolesearch <value>", "Search for a console")
-  .option("-cg, --cgames <value>", "Scroll through a console's library")
+  .option("-f, --find <value>", "Find a console")
+  .option("-l, --library <value>", "Scroll through a console's library")
   .option("-g, --game <value>", "Search for a game")
   .parse(process.argv);
 
@@ -35,27 +35,79 @@ if (options.consoles) {
     });
 }
 //! Search for a console
-if (options.consolesearch) {
+if (options.find) {
   const targetUrl = "https://squid-proxy.xyz/";
 
-  typeInSearchBar(targetUrl, options.consolesearch);
+  typeInSearchBar(targetUrl, options.find);
+}
+
+//! Scroll through console's library
+if (options.library) {
+  const targetUrl = "https://squid-proxy.xyz/";
+  switch (options.library) {
+    case "gameboy":
+      let downloadLink = targetUrl + "Nintendo%20Gameboy/";
+      consoleSearch(downloadLink).then((selected) => {
+        const spaceFill = "%20";
+        const title: string | any = selected;
+
+        const constructedUrl = downloadLink + title.replaceAll(" ", spaceFill);
+
+        const fileName = title.replaceAll(" ", "_");
+        const savePath = `./${fileName}`;
+        console.log(constructedUrl);
+        downloadFile(constructedUrl, savePath)
+          .then(() => {
+            console.log("File downloaded successfully!");
+          })
+          .catch((error) => {
+            console.error("Error downloading file:", error);
+          });
+      });
+      break;
+    case "playstation1":
+      console.log(figlet.textSync("PLAYSTATION 1"));
+      let playdownloadLink = targetUrl + "Playstation%201/";
+      consoleSearch(playdownloadLink).then((selected) => {
+        const spaceFill = "%20";
+        const title: string | any = selected;
+
+        const constructedUrl =
+          playdownloadLink + title.replaceAll(" ", spaceFill);
+
+        const fileName = title.replaceAll(" ", "_");
+        const savePath = `./${fileName}`;
+        console.log(constructedUrl);
+        downloadFile(constructedUrl, savePath)
+          .then(() => {
+            console.log("File downloaded successfully!");
+          })
+          .catch((error) => {
+            console.error("Error downloading file:", error);
+          });
+      });
+      break;
+    default:
+      console.log("Nothing");
+  }
 }
 
 //! Scroll through a console's library
 const consoleURL = "https://squid-proxy.xyz/Nintendo%20Gameboy/";
-async function consoleSearch(url: string): Promise<string[]> {
+async function consoleSearch(url: string): Promise<string[] | string> {
   try {
     const response = await axios.get(url);
     const html = response.data;
 
     const $ = cheerio.load(html);
+
     const links: string[] = [];
     const regex = /\/|%20/g;
     $("a").each((index, element) => {
       const href = $(element).attr("href");
       if (href) {
-        if (href.includes(".zip")) {
-          let parsedHref = href.replace(regex, "").replace(regex, " ");
+        if (href.includes(".zip") || href.includes(".7z")) {
+          let parsedHref = href.replace(regex, " ");
           links.push(parsedHref);
         }
       }
@@ -76,8 +128,7 @@ async function consoleSearch(url: string): Promise<string[]> {
   }
 }
 
-consoleSearch(consoleURL);
-
+//! Function to simulate typing into a search bar and return the filtered results
 async function typeInSearchBar(url: string, searchText: string) {
   try {
     const browser = await puppeteer.launch({
@@ -129,18 +180,6 @@ async function typeInSearchBar(url: string, searchText: string) {
     console.error("Error:", error);
   }
 }
-
-//! Example of how to download a file and save it in the same directory
-// const fileUrl =
-//   "https://squid-proxy.xyz/Nintendo%20DS/%27Chou%27%20Kowai%20Hanashi%20DS%20-%20Ao%20no%20Shou%20(Japan).zip";
-// const savePath = "./downloadedDir.zip";
-// downloadFile(fileUrl, savePath)
-//   .then(() => {
-//     console.log("File downloaded successfully!");
-//   })
-//   .catch((error) => {
-//     console.error("Error downloading file:", error);
-//   });
 
 //! Downloads a file
 async function downloadFile(
