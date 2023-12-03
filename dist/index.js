@@ -19,24 +19,37 @@ console.log(figlet.textSync("ROM-CLI"));
 program
     .version("1.0.0")
     .description("A simple tool that allows quick search and download of ROMs for various emulators")
-    .option("-c, --consoles", "Lists all available consoles")
-    .option("-f, --find <value>", "Find a console")
-    .option("-l, --library <value>", "Scroll through a console's library")
+    .option("-c, --consoles", "Lists all available consoles and their respective arguments")
+    .option("-l, --library <console>", "Scroll through a console's library")
     .option("-g, --game <value>", "Search for a game")
     .parse(process.argv);
 const options = program.opts();
 //! Get all consoles to list
 if (options.consoles) {
-    const websiteUrl = "https://squid-proxy.xyz/";
-    getLinks(websiteUrl)
-        .then((links) => {
-        console.log("Found consoles:", links);
-    })
-        .catch((error) => {
-        console.error("Error fetching links:", error);
-    });
+    // const websiteUrl = "https://squid-proxy.xyz/";
+    // getLinks(websiteUrl)
+    //   .then((links) => {
+    //     console.log("Found consoles:", links);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching links:", error);
+    //   });
+    const currentConsoles = [
+        "PlayStation Portable (psp)",
+        "PlayStation 1 (playstation1)",
+        "PlayStation 2 (playstation2)",
+        "PlayStation 3 (playstation3)",
+        "Nintendo Gameboy (gameboy)",
+        "Nintendo Wii (wii)",
+        "Nintendo Gamecube (gamecube)",
+        "Nintendo 64 (n64)",
+    ];
+    const list = [];
+    for (let i = 0; i < currentConsoles.length; i++) {
+        console.log(currentConsoles[i]);
+    }
 }
-//! Search for a console
+//! Search for a console, kinda useless rn
 if (options.find) {
     const targetUrl = "https://squid-proxy.xyz/";
     typeInSearchBar(targetUrl, options.find);
@@ -71,10 +84,26 @@ if (options.library) {
             downloadLink = targetUrl + "Nintendo%20Gamecube/US/";
             librarySearch(downloadLink);
             break;
+        case "n64":
+            console.log(figlet.textSync("Nintendo 64"));
+            downloadLink = targetUrl + "Nintendo%2064/Big%20Endian/";
+            librarySearch(downloadLink);
+            break;
+        case "wii":
+            console.log(figlet.textSync("Nintendo Wii"));
+            downloadLink = targetUrl + "Nintendo%20Wii/ISO/Usa/";
+            librarySearch(downloadLink);
+            break;
+        case "psp":
+            console.log(figlet.textSync("Playstation Portable"));
+            downloadLink = targetUrl + "Playstation%20Portable/ISO/";
+            librarySearch(downloadLink);
+            break;
         default:
             console.log("Nothing");
     }
 }
+//! Helper function for switch above
 function librarySearch(url) {
     return __awaiter(this, void 0, void 0, function* () {
         consoleSearch(url).then((selected) => {
