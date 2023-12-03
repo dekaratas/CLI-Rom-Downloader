@@ -169,10 +169,28 @@ function typeInSearchBar(url, searchText) {
 function downloadFile(url, destinationPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            let startTime = null;
+            let previousLoaded = 0;
+            let downloadSpeed = 0;
             const response = yield axios({
                 method: "get",
                 url: url,
                 responseType: "stream",
+                onDownloadProgress: (progressEvent) => {
+                    const currentTime = Date.now();
+                    const elapsedTime = (currentTime - (startTime || currentTime)) / 1000;
+                    if (!startTime) {
+                        startTime = currentTime;
+                    }
+                    const loaded = progressEvent.loaded;
+                    const total = progressEvent.total || 0;
+                    const percentCompleted = Math.floor((loaded * 100) / total);
+                    process.stdout.clearLine(0);
+                    process.stdout.cursorTo(0);
+                    process.stdout.write(`Downloading... ${percentCompleted}% - Speed: ${downloadSpeed.toFixed(2)} KB/s `);
+                    downloadSpeed = (loaded - previousLoaded) / 1024 / elapsedTime;
+                    previousLoaded = loaded;
+                },
             });
             const writer = fs.createWriteStream(destinationPath);
             response.data.pipe(writer);
