@@ -19,7 +19,7 @@ console.log(figlet.textSync("ROM-CLI"));
 program
     .version("1.0.0")
     .description("A simple tool that allows quick search and download of ROMs for various emulators")
-    .option("-c, --consoles [value]", "Lists all available consoles")
+    .option("-c, --consoles", "Lists all available consoles")
     .option("-f, --find <value>", "Find a console")
     .option("-l, --library <value>", "Scroll through a console's library")
     .option("-g, --game <value>", "Search for a game")
@@ -44,47 +44,50 @@ if (options.find) {
 //! Scroll through console's library
 if (options.library) {
     const targetUrl = "https://squid-proxy.xyz/";
+    let downloadLink = "";
     switch (options.library) {
         case "gameboy":
-            let downloadLink = targetUrl + "Nintendo%20Gameboy/";
-            consoleSearch(downloadLink).then((selected) => {
-                const spaceFill = "%20";
-                const title = selected;
-                const constructedUrl = downloadLink + title.replaceAll(" ", spaceFill);
-                const fileName = title.replaceAll(" ", "_");
-                const savePath = `./${fileName}`;
-                console.log(constructedUrl);
-                downloadFile(constructedUrl, savePath)
-                    .then(() => {
-                    console.log("File downloaded successfully!");
-                })
-                    .catch((error) => {
-                    console.error("Error downloading file:", error);
-                });
-            });
+            console.log(figlet.textSync("Nintendo Gameboy"));
+            downloadLink = targetUrl + "Nintendo%20Gameboy/";
+            librarySearch(downloadLink);
             break;
         case "playstation1":
             console.log(figlet.textSync("PLAYSTATION 1"));
-            let playdownloadLink = targetUrl + "Playstation%201/";
-            consoleSearch(playdownloadLink).then((selected) => {
-                const spaceFill = "%20";
-                const title = selected;
-                const constructedUrl = playdownloadLink + title.replaceAll(" ", spaceFill);
-                const fileName = title.replaceAll(" ", "_");
-                const savePath = `./${fileName}`;
-                console.log(constructedUrl);
-                downloadFile(constructedUrl, savePath)
-                    .then(() => {
-                    console.log("File downloaded successfully!");
-                })
-                    .catch((error) => {
-                    console.error("Error downloading file:", error);
-                });
-            });
+            downloadLink = targetUrl + "Playstation%201/";
+            librarySearch(downloadLink);
+            break;
+        case "playstation2":
+            console.log(figlet.textSync("PLAYSTATION 2"));
+            downloadLink = targetUrl + "Playstation%202/";
+            librarySearch(downloadLink);
+            break;
+        case "playstation3":
+            console.log(figlet.textSync("PLAYSTATION 3"));
+            downloadLink = targetUrl + "Playstation%203/ISO/";
+            librarySearch(downloadLink);
             break;
         default:
             console.log("Nothing");
     }
+}
+function librarySearch(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        consoleSearch(url).then((selected) => {
+            const spaceFill = "%20";
+            const title = selected;
+            const constructedUrl = url + title.replaceAll(" ", spaceFill);
+            const fileName = title.replaceAll(" ", "_");
+            const savePath = `./${fileName}`;
+            console.log(constructedUrl);
+            downloadFile(constructedUrl, savePath)
+                .then(() => {
+                console.log("File downloaded successfully!");
+            })
+                .catch((error) => {
+                console.error("Error downloading file:", error);
+            });
+        });
+    });
 }
 //! Scroll through a console's library
 const consoleURL = "https://squid-proxy.xyz/Nintendo%20Gameboy/";
@@ -99,7 +102,9 @@ function consoleSearch(url) {
             $("a").each((index, element) => {
                 const href = $(element).attr("href");
                 if (href) {
-                    if (href.includes(".zip") || href.includes(".7z")) {
+                    if (href.includes(".zip") ||
+                        href.includes(".7z") ||
+                        href.includes(".rar")) {
                         let parsedHref = href.replace(regex, " ");
                         links.push(parsedHref);
                     }
