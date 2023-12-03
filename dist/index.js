@@ -26,14 +26,6 @@ program
 const options = program.opts();
 //! Get all consoles to list
 if (options.consoles) {
-    // const websiteUrl = "https://squid-proxy.xyz/";
-    // getLinks(websiteUrl)
-    //   .then((links) => {
-    //     console.log("Found consoles:", links);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error fetching links:", error);
-    //   });
     const currentConsoles = [
         "PlayStation Portable (psp)",
         "PlayStation 1 (playstation1)",
@@ -51,8 +43,7 @@ if (options.consoles) {
 }
 //! Search game function
 if (options.game) {
-    console.log("NICUU GAMEUUU");
-    const targetUrl = "https://squid-proxy.xyz/Nintendo%20Gamecube/US/";
+    const targetUrl = "https://squid-proxy.xyz/";
     typeInSearchBar(targetUrl, options.game).then((selected) => {
         const spaceFill = "%20";
         const title = selected;
@@ -178,6 +169,17 @@ function consoleSearch(url) {
 function typeInSearchBar(url, searchText) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const links = [];
+            const consoleURLs = [
+                "Nintendo%20Gameboy/",
+                "Playstation%201/",
+                "Playstation%202/",
+                "Playstation%203/ISO/",
+                "Nintendo%20Gamecube/US/",
+                "Nintendo%2064/Big%20Endian/",
+                "Nintendo%20Wii/ISO/Usa/",
+                "Playstation%20Portable/ISO/",
+            ];
             const browser = yield puppeteer.launch({
                 headless: "new",
             });
@@ -186,13 +188,11 @@ function typeInSearchBar(url, searchText) {
             const content = yield page.content();
             const $ = cheerio.load(content);
             const searchBar = $("#search");
-            // Perform actions with Puppeteer
             if (searchBar.length > 0) {
                 yield page.type("#search", searchText);
                 const updatedContent = yield page.content();
                 const parsedContent = updatedContent.replace(/<tr[^>]*hidden[^>]*>.*?<\/tr>\n?/g, "");
                 const updated$ = cheerio.load(parsedContent);
-                const links = [];
                 const regex = /\//g;
                 const regexTwo = /\/|%20/g;
                 updated$("a").each((index, element) => {

@@ -27,14 +27,6 @@ const options = program.opts();
 
 //! Get all consoles to list
 if (options.consoles) {
-  // const websiteUrl = "https://squid-proxy.xyz/";
-  // getLinks(websiteUrl)
-  //   .then((links) => {
-  //     console.log("Found consoles:", links);
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error fetching links:", error);
-  //   });
   const currentConsoles = [
     "PlayStation Portable (psp)",
     "PlayStation 1 (playstation1)",
@@ -53,7 +45,7 @@ if (options.consoles) {
 
 //! Search game function
 if (options.game) {
-  const targetUrl = "https://squid-proxy.xyz/Nintendo%20Gamecube/US/";
+  const targetUrl = "https://squid-proxy.xyz/";
   typeInSearchBar(targetUrl, options.game).then((selected) => {
     const spaceFill = "%20";
     const title: string | any = selected;
@@ -187,18 +179,28 @@ async function consoleSearch(url: string): Promise<string[] | string> {
 //! Function to simulate typing into a search bar and return the filtered results
 async function typeInSearchBar(url: string, searchText: string) {
   try {
+    const links: string[] = [];
+    const consoleURLs = [
+      "Nintendo%20Gameboy/",
+      "Playstation%201/",
+      "Playstation%202/",
+      "Playstation%203/ISO/",
+      "Nintendo%20Gamecube/US/",
+      "Nintendo%2064/Big%20Endian/",
+      "Nintendo%20Wii/ISO/Usa/",
+      "Playstation%20Portable/ISO/",
+    ];
+
     const browser = await puppeteer.launch({
       headless: "new",
     });
     const page = await browser.newPage();
     await page.goto(url);
-
     const content = await page.content();
     const $ = cheerio.load(content);
 
     const searchBar = $("#search");
 
-    // Perform actions with Puppeteer
     if (searchBar.length > 0) {
       await page.type("#search", searchText);
       const updatedContent = await page.content();
@@ -208,7 +210,6 @@ async function typeInSearchBar(url: string, searchText: string) {
       );
       const updated$ = cheerio.load(parsedContent);
 
-      const links: string[] = [];
       const regex = /\//g;
       const regexTwo = /\/|%20/g;
 
