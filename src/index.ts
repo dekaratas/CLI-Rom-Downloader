@@ -51,11 +51,26 @@ if (options.consoles) {
   }
 }
 
-//! Search for a console, kinda useless rn
-if (options.find) {
-  const targetUrl = "https://squid-proxy.xyz/";
+//! Search game function
+if (options.game) {
+  const targetUrl = "https://squid-proxy.xyz/Nintendo%20Gamecube/US/";
+  typeInSearchBar(targetUrl, options.game).then((selected) => {
+    const spaceFill = "%20";
+    const title: string | any = selected;
 
-  typeInSearchBar(targetUrl, options.find);
+    const constructedUrl = targetUrl + title.replaceAll(" ", spaceFill);
+
+    const fileName = title.replaceAll(" ", "_");
+    const savePath = `./${fileName}`;
+    console.log(constructedUrl);
+    downloadFile(constructedUrl, savePath)
+      .then(() => {
+        console.log("File downloaded successfully!");
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
+  });
 }
 
 //! Scroll through console's library
@@ -130,7 +145,6 @@ async function librarySearch(url: string) {
 }
 
 //! Scroll through a console's library
-const consoleURL = "https://squid-proxy.xyz/Nintendo%20Gameboy/";
 async function consoleSearch(url: string): Promise<string[] | string> {
   try {
     const response = await axios.get(url);
@@ -201,18 +215,29 @@ async function typeInSearchBar(url: string, searchText: string) {
       updated$("a").each((index, element) => {
         const href = $(element).attr("href");
         if (href) {
-          if (href.slice(href.length - 1) == "/") {
-            let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
-            if (
-              !parsedHref.includes("http") &&
-              !parsedHref.includes("NoIntro")
-            ) {
-              console.log(parsedHref);
-              links.push(parsedHref);
-            }
+          let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
+          if (
+            !parsedHref.includes("http") &&
+            !parsedHref.includes("NoIntro") &&
+            !parsedHref.includes("?C")
+          ) {
+            console.log(parsedHref);
+            console.log(href);
+            links.push(parsedHref);
           }
         }
       });
+      const selectedLink = await inquirer.prompt([
+        {
+          type: "list",
+          name: "link",
+          pageSize: "20",
+          message: "Select a file:",
+          choices: links,
+        },
+      ]);
+
+      return selectedLink.link;
     } else {
       console.log("Search bar not found.");
     }

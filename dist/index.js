@@ -49,10 +49,25 @@ if (options.consoles) {
         console.log(currentConsoles[i]);
     }
 }
-//! Search for a console, kinda useless rn
-if (options.find) {
-    const targetUrl = "https://squid-proxy.xyz/";
-    typeInSearchBar(targetUrl, options.find);
+//! Search game function
+if (options.game) {
+    console.log("NICUU GAMEUUU");
+    const targetUrl = "https://squid-proxy.xyz/Nintendo%20Gamecube/US/";
+    typeInSearchBar(targetUrl, options.game).then((selected) => {
+        const spaceFill = "%20";
+        const title = selected;
+        const constructedUrl = targetUrl + title.replaceAll(" ", spaceFill);
+        const fileName = title.replaceAll(" ", "_");
+        const savePath = `./${fileName}`;
+        console.log(constructedUrl);
+        downloadFile(constructedUrl, savePath)
+            .then(() => {
+            console.log("File downloaded successfully!");
+        })
+            .catch((error) => {
+            console.error("Error downloading file:", error);
+        });
+    });
 }
 //! Scroll through console's library
 if (options.library) {
@@ -124,7 +139,6 @@ function librarySearch(url) {
     });
 }
 //! Scroll through a console's library
-const consoleURL = "https://squid-proxy.xyz/Nintendo%20Gameboy/";
 function consoleSearch(url) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -184,16 +198,26 @@ function typeInSearchBar(url, searchText) {
                 updated$("a").each((index, element) => {
                     const href = $(element).attr("href");
                     if (href) {
-                        if (href.slice(href.length - 1) == "/") {
-                            let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
-                            if (!parsedHref.includes("http") &&
-                                !parsedHref.includes("NoIntro")) {
-                                console.log(parsedHref);
-                                links.push(parsedHref);
-                            }
+                        let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
+                        if (!parsedHref.includes("http") &&
+                            !parsedHref.includes("NoIntro") &&
+                            !parsedHref.includes("?C")) {
+                            console.log(parsedHref);
+                            console.log(href);
+                            links.push(parsedHref);
                         }
                     }
                 });
+                const selectedLink = yield inquirer.prompt([
+                    {
+                        type: "list",
+                        name: "link",
+                        pageSize: "20",
+                        message: "Select a file:",
+                        choices: links,
+                    },
+                ]);
+                return selectedLink.link;
             }
             else {
                 console.log("Search bar not found.");
