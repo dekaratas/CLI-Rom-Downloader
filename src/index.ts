@@ -45,11 +45,17 @@ async function getLinks(url: string): Promise<string[]> {
 
     const $ = cheerio.load(html);
     const links: string[] = [];
-
+    const regex = /\//g;
+    const regexTwo = /\/|%20/g;
     $("a").each((index, element) => {
       const href = $(element).attr("href");
       if (href) {
-        links.push(href);
+        if (href.slice(href.length - 1) == "/") {
+          let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
+          if (!parsedHref.includes("http") && !parsedHref.includes("NoIntro")) {
+            links.push(parsedHref);
+          }
+        }
       }
     });
 

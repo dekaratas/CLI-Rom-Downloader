@@ -73,10 +73,17 @@ function getLinks(url) {
             const html = response.data;
             const $ = cheerio.load(html);
             const links = [];
+            const regex = /\//g;
+            const regexTwo = /\/|%20/g;
             $("a").each((index, element) => {
                 const href = $(element).attr("href");
                 if (href) {
-                    links.push(href);
+                    if (href.slice(href.length - 1) == "/") {
+                        let parsedHref = href.replace(regex, "").replace(regexTwo, " ");
+                        if (!parsedHref.includes("http") && !parsedHref.includes("NoIntro")) {
+                            links.push(parsedHref);
+                        }
+                    }
                 }
             });
             return links;
@@ -99,7 +106,7 @@ const savePath = "./downloadedDir.zip";
 const websiteUrl = "https://squid-proxy.xyz/";
 getLinks(websiteUrl)
     .then((links) => {
-    console.log("Found links:", links);
+    console.log("Found consoles:", links);
 })
     .catch((error) => {
     console.error("Error fetching links:", error);
