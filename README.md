@@ -2,7 +2,7 @@
 
 ![](https://i.imgur.com/kYI0pJM.png)
 
-A very simple command line tool that both cheerio and puppetteer to offer quick access to an expansive repository of old school ROMs. You can navigate through various console libraries and search for specific games via name.
+A very simple command line tool that utilizes both cheerio and puppetteer to offer quick access to an expansive repository of old school ROMs. You can navigate through various console libraries and search for specific games via name.
 Download takes place in the working directory you're currently situated in.
 
 Depending on the site's traffic, loading an entire library might take a second.
