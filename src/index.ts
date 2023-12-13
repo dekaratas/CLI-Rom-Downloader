@@ -14,7 +14,7 @@ const program = new Command();
 console.log(chalk.blue.bold(figlet.textSync("ROM-CLI")));
 
 program
-  .version("1.0.0")
+  .version("1.0.2")
   .description(
     "A simple tool that allows quick search and download of ROMs for various emulators"
   )

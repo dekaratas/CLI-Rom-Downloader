@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+// #! /usr/bin/env node
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -19,7 +19,7 @@ import chalk from "chalk";
 const program = new Command();
 console.log(chalk.blue.bold(figlet.textSync("ROM-CLI")));
 program
-    .version("1.0.0")
+    .version("1.0.2")
     .description("A simple tool that allows quick search and download of ROMs for various emulators")
     .option("-c, --consoles", "Lists all available consoles and their respective arguments")
     .option("-l, --library <console>", "Scroll through a console's library")
