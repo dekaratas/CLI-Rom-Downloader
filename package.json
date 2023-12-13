@@ -1,7 +1,7 @@
 {
-  "name": "cli-rom-downloader",
+  "name": "@dekaratas/cli-rom-downloader",
   "version": "1.0.0",
-  "description": "A simple tool that allows quick search and download of ROMs for various emulators",
+  "description": "A simple CLI tool that allows quick search and download of ROMs for various emulators",
   "main": "dist/index.js",
   "bin": {
     "rom-cli": "./dist/index.js"
@@ -11,9 +11,16 @@
     "build": "npx tsc"
   },
   "type": "module",
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cli",
+    "npmtool",
+    "retro",
+    "gaming"
+  ],
+  "author": "Dennis Karatas",
   "license": "ISC",
+  "repository": "https://github.com/dekaratas/cli-rom-downloader",
+  "homepage": "https://github.com/dekaratas/cli-rom-downloader#readme",
   "devDependencies": {
     "@types/figlet": "^1.5.8",
     "@types/inquirer": "^9.0.7",
